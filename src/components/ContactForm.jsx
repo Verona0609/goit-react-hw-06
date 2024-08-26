@@ -3,6 +3,9 @@ import * as Yup from "yup";
 
 import { nanoid } from "nanoid";
 import styles from "./ContactForm.module.css";
+
+import { useDispatch } from "react-redux";
+import { addContact } from "../redux/contactsSlice";
 /* const numberVal = /([0-9]{3})[0-9]{3}-[0-9]{4}/; */
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -16,20 +19,31 @@ const validationSchema = Yup.object().shape({
   /*  .matches(numberVal) */
 });
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+
   const handleSubmit = (values, { resetForm }) => {
+    const newContact = {
+      id: nanoid(),
+      name: values.name,
+      number: values.number,
+    };
+    dispatch(addContact(newContact));
+    resetForm();
+  };
+  /*   const handleSubmit = (values, { resetForm }) => {
     onAddContact({
       id: nanoid(),
       name: values.name,
       number: values.number,
     });
     resetForm();
-  };
+  };*/
   const initialValues = { name: "", number: "" };
   return (
     <Formik
-      validationSchema={validationSchema}
       initialValues={initialValues}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
       <Form className={styles.form}>
@@ -43,7 +57,7 @@ const ContactForm = ({ onAddContact }) => {
 
         <div>
           <label className={styles.titel} htmlFor="number">
-            Number{" "}
+            Number
           </label>
           <Field className={styles.field} type="number" name="number"></Field>
           <ErrorMessage
